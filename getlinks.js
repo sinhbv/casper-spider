@@ -12,7 +12,7 @@ var casper = require('casper').create({
     pageSettings: {
         loadImages: false,        // The WebPage instance used by Casper will
         loadPlugins: true        // use these settings
-    }
+    } 
 });
 
 
