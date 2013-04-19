@@ -85,7 +85,10 @@ casper.start().each(GetDatas, function (self, data) {
             try {
                 var anchors = __utils__.findAll('a[href^="http://detail.tmall.com/item.htm?spm"]');
                 for (var i = 0; i < anchors.length; i++) {
-                    anchorLinks.push(anchors[i].getAttribute('href'));
+                    if (anchorLinks.indexOf(anchors[i].getAttribute('href'))<0) {
+                        anchorLinks.push(anchors[i].getAttribute('href'));
+                    }
+                    
                 }
             }
             catch (e) {
