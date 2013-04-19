@@ -1,9 +1,9 @@
 ﻿var utils = require('utils');
 var fs = require('fs');
 var casper = require('casper').create({
-    //	clientScripts:  [
-    //		'includes/jquery.js'
-    //    	],
+    	clientScripts:  [
+    		'includes/jquery.js'
+        	],
     verbose: true,
     onError: function (self, m) {   // Any "error" level message will be written
         console.log('FATAL:' + m); // on the console output and PhantomJS will
@@ -12,7 +12,7 @@ var casper = require('casper').create({
     pageSettings: {
         loadImages: false,        // The WebPage instance used by Casper will
         loadPlugins: true        // use these settings
-    }
+    } 
 });
 
 
@@ -78,6 +78,20 @@ casper.start().each(GetDatas, function (self, data) {
     self.wait(5000, function () {
     });
     self.then(function () {
+
+
+
+
+        this.echo(this.evaluate(function () {
+            if (typeof ($.ajax) == "function") {
+                return "jQuery loaded success."
+            }
+            else {
+                return "jQuery loaded failed."
+            }
+        }));
+
+
         count++;
         this.echo(count.toString() + '/' + GetDatas.length);        
         var links = this.evaluate(function () {
@@ -85,7 +99,10 @@ casper.start().each(GetDatas, function (self, data) {
             try {
                 var anchors = __utils__.findAll('a[href^="http://detail.tmall.com/item.htm?spm"]');
                 for (var i = 0; i < anchors.length; i++) {
-                    anchorLinks.push(anchors[i].getAttribute('href'));
+                    if (anchorLinks.indexOf(anchors[i].getAttribute('href'))<0) {
+                        anchorLinks.push(anchors[i].getAttribute('href'));
+                    }
+                    
                 }
             }
             catch (e) {
@@ -209,12 +226,14 @@ casper.start().each(GetDatas, function (self, data) {
     });
 });
 
-//casper.then(function () {
-//    count = 0;
-//    this.each(products, function (self, product) {        
+casper.then(function () {
+    count = 0;
+    this.each(products, function (self, product) {        
        
-//    });
-//});
+    });
+});
+
+
 
 
 
