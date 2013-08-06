@@ -1,9 +1,6 @@
 ﻿var utils = require('utils');
 var fs = require('fs');
 var casper = require('casper').create({
-    	clientScripts:  [
-    		'includes/jquery.js'
-        	],
     verbose: true,
     onError: function (self, m) {   // Any "error" level message will be written
         console.log('FATAL:' + m); // on the console output and PhantomJS will
@@ -18,7 +15,7 @@ var casper = require('casper').create({
 
 
 var stores = [];
-//var products = [];
+var products = [];
 
 
 var GetDatas = [//{ "Name": "Only", "Link": "http://only.tmall.com/shop/view_shop.htm?spm=a220m.1000858.1000719.1.hZ5QY8" },
@@ -28,7 +25,7 @@ var GetDatas = [//{ "Name": "Only", "Link": "http://only.tmall.com/shop/view_sho
 //{ "Name": "以纯", "Link": "http://yishion.tmall.com/shop/view_shop.htm?spm=a220m.1000858.1000719.1.dWGzsZ" },
 //{ "Name": "美邦", "Link": "http://metersbonwe.tmall.com/shop/view_shop.htm?spm=a220m.1000858.1000719.1.ND81JV" },
 //{ "Name": "森马", "Link": "http://semir.tmall.com/shop/view_shop.htm?spm=a220m.1000858.1000719.1.rnIpzf" },
-{ "Name": "佰林娜旗舰店", "Link": "http://bailinna.tmall.com/shop/view_shop.htm?spm=a1z0d.1.1000638.1.21KNi3&shop_id=59908060" },
+//{ "Name": "佰林娜旗舰店", "Link": "http://bailinna.tmall.com/shop/view_shop.htm?spm=a1z0d.1.1000638.1.21KNi3&shop_id=59908060" },
 //{ "Name": "搜酷箱包", "Link": "http://socool.tmall.com/shop/view_shop.htm?spm=0.0.0.196.srOk0q" },
 //{ "Name": "麦包包箱包", "Link": "http://mbaobao.tmall.com/shop/view_shop.htm?spm=0.0.0.190.KMFiOB" },
 //{ "Name": "Skin Food", "Link": "http://skinfood.tmall.com/shop/view_shop.htm?spm=a220m.1000858.1000719.1.pLWBbW" },
@@ -64,7 +61,7 @@ var GetDatas = [//{ "Name": "Only", "Link": "http://only.tmall.com/shop/view_sho
 //{ "Name": "先锋欧楠专卖店", "Link": "http://singfunon.tmall.com/?spm=a220o.1000859.0.175.6FCWme" },
 //{ "Name": "凯莱手表专营店", "Link": "http://klsb.tmall.com/shop/view_shop.htm?spm=a220m.1000862.1000730.3.PpcxEl&user_number_id=506880127" },
 //{ "Name": "宾格东宸专卖店", "Link": "http://bingerdc.tmall.com/shop/view_shop.htm?spm=a220m.1000862.1000730.3.TvHADu&user_number_id=1036969135" },
-//{ "Name": "佳能相机好邦专卖店", "Link": "http://cnhb.tmall.com/shop/view_shop.htm?spm=a220m.1000862.1000730.3.BjJNat&user_number_id=92380154" },
+{ "Name": "佳能相机好邦专卖店", "Link": "http://cnhb.tmall.com/shop/view_shop.htm?spm=a220m.1000862.1000730.3.BjJNat&user_number_id=92380154" },
 //{ "Name": "西门子璞高专卖", "Link": "http://shsiemens.tmall.com/shop/view_shop.htm?spm=a220m.1000862.1000730.3.zvcOi1&user_number_id=182522763" },
 //{ "Name": "koti柯帝旗舰店", "Link": "http://koti.tmall.com/?spm=a220o.1000855.0.131.qWF1ir" },
 //{ "Name": "小奶花旗舰店", "Link": "http://xiaonaihua.tmall.com/shop/view_shop.htm?spm=a220m.1000862.1000730.3.h1YBap&user_number_id=276040311" }
@@ -73,42 +70,44 @@ var GetDatas = [//{ "Name": "Only", "Link": "http://only.tmall.com/shop/view_sho
 var count = 0;
 casper.start().each(GetDatas, function (self, data) {
     var products = [];
-    self.thenOpen(data.Link, function () {        
+    self.thenOpen(data.Link, function () {           
     });
     self.wait(5000, function () {
     });
     self.then(function () {
-
-
-
-
-        this.echo(this.evaluate(function () {
-            if (typeof ($.ajax) == "function") {
-                return "jQuery loaded success."
-            }
-            else {
-                return "jQuery loaded failed."
-            }
-        }));
-
-
         count++;
-        this.echo(count.toString() + '/' + GetDatas.length);        
-        var links = this.evaluate(function () {
+        this.echo(count.toString() + '/' + GetDatas.length);
+        var printFunction=this.echo;
+        var links = this.evaluate(function (fp) {
             var anchorLinks = [];
+            var productIds = {};
+            var productId = '';
+            var attributeLink = '';
+            var findStart = 0;
+            var findEnd = 0;
             try {
-                var anchors = __utils__.findAll('a[href^="http://detail.tmall.com/item.htm?spm"]');
+                var anchors = __utils__.findAll('a[href^="http://detail.tmall.com/item.htm"]');                
                 for (var i = 0; i < anchors.length; i++) {
-                    if (anchorLinks.indexOf(anchors[i].getAttribute('href'))<0) {
-                        anchorLinks.push(anchors[i].getAttribute('href'));
-                    }
-                    
+                    attributeLink = anchors[i].getAttribute('href');
+                    findStart = attributeLink.indexOf('id=');
+                    if(findStart < 0) continue;
+                    findStart += 3;
+                    findEnd = attributeLink.indexOf('&', findStart);
+                    if(findEnd < 0) findEnd = attributeLink.length;
+                    productId = attributeLink.substring(findStart,findEnd);
+                    if (!productIds[productId]) 
+                    {
+                        productIds[productId] = true;
+                        anchorLinks.push(attributeLink);
+                    }                    
                 }
             }
             catch (e) {
+                anchorLinks = e;
             }
             return anchorLinks;
         });
+        this.echo(JSON.stringify(links));
         var product;
         for (var i = 0; i < links.length; i++) {
             product = new Object;
@@ -244,5 +243,3 @@ casper.run(function () {
     //stream.close();
     this.echo('done').exit();
 });
-
-
