@@ -77,8 +77,8 @@ casper.start().each(GetDatas, function (self, data) {
     self.then(function () {
         count++;
         this.echo(count.toString() + '/' + GetDatas.length);
-        var printFunction=this.echo;
-        var links = this.evaluate(function (fp) {
+        //var printFunction=this.echo;
+        var links = this.evaluate(function () {
             var anchorLinks = [];
             var productIds = {};
             var productId = '';
@@ -107,7 +107,7 @@ casper.start().each(GetDatas, function (self, data) {
             }
             return anchorLinks;
         });
-        this.echo(JSON.stringify(links));
+        //this.echo(JSON.stringify(links));
         var product;
         for (var i = 0; i < links.length; i++) {
             product = new Object;
