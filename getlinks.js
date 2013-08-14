@@ -1,4 +1,32 @@
-﻿var utils = require('utils');
+﻿/* Patch*/
+var os = require('system').os;
+
+var workingDir = require('fs').workingDirectory;
+var casperPath = '';
+var bootstrapPath = '';
+
+console.log('current system: ' + os.name);
+
+if(os.name == 'windows'){
+	casperPath = workingDir + '\\casperjs';
+	bootstrapPath = casperPath + '\\bin\\bootstrap.js';
+}
+
+if(os.name == 'mac'){
+	casperPath = require('fs').workingDirectory + '/casperjs';
+	bootstrapPath = casperPath + '/bin/bootstrap.js';	
+}
+
+console.log('casperPath: ' + casperPath);
+console.log('bootstrapPath: ' + bootstrapPath);
+
+phantom.casperPath = casperPath;
+phantom.injectJs(bootstrapPath);
+
+console.log('initialize done.');
+/********/
+
+var utils = require('utils');
 var fs = require('fs');
 var casper = require('casper').create({
     verbose: true,
