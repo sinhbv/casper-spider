@@ -17,6 +17,11 @@ if(os.name == 'mac'){
 	bootstrapPath = casperPath + '/bin/bootstrap.js';	
 }
 
+if(os.name == 'linux'){
+	casperPath = require('fs').workingDirectory + '/casperjs';
+	bootstrapPath = casperPath + '/bin/bootstrap.js';
+}
+
 console.log('casperPath: ' + casperPath);
 console.log('bootstrapPath: ' + bootstrapPath);
 
